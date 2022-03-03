@@ -1,6 +1,7 @@
 #!/usr/bin/env vtkpython
+# 2022-03-03 Mark Van Moer, NCSA
 
-# This is using VTK 9.1, VTK has breaking API changes at major number
+# Tested with VTK 9.1, VTK has breaking API changes at major number
 # releases, e.g., 8.x to 9.x.
 
 # reading data from a VTK XML PolyData (.vtp)
