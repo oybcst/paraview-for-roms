@@ -1,4 +1,5 @@
 #!/usr/bin/env vtkpython
+# 2022-03-03 Mark Van Moer, NCSA
 
 # same as read_single_polyline.py except now the .vtp file contains 
 # multiple polylines. This data set is some arbitrary streamlines 
