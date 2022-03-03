@@ -8,6 +8,7 @@ pvbatch file tested on ParaView 5.9.1
 - BUG: the generated .pvd will contain munged timesteps written in scientific notation with loss of precision
 
 temporalparticlestopathlines_setup_2.pvsm
+
 This is a ParaView state file which can be loaded in the GUI using
 File | Load State. It shows the pipeline that can export pathlines 
 using File | Save Data. This will export all visible
