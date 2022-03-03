@@ -1,4 +1,7 @@
-# trace generated using paraview version 5.9.1
+# 2022-03-03 Mark Van Moer, NCSA
+# edit of trace generated using paraview version 5.9.1
+# !!! be sure to set the datapath variable appropriately !!!
+# !!! be sure to set the ouputpath variable appropriately !!!
 
 #### import the simple module from the paraview
 from paraview.simple import *
@@ -7,7 +10,7 @@ paraview.simple._DisableFirstRenderCameraReset()
 
 # create a new 'NetCDF Reader'
 data = 'top_slice_test.nc'
-datapath = '/home/mvanmoer/Vis/projects/lowe-esrt/data/derived/' 
+datapath = './'
 top_slice_testnc = NetCDFReader(registrationName=data, FileName=[datapath + data])
 top_slice_testnc.Dimensions = '(latitude, longitude)'
 
@@ -118,7 +121,7 @@ Hide(particleTracer1, renderView1)
 # 1 - the particles
 Hide(OutputPort(temporalParticlesToPathlines1, 1), renderView1)
 
-outputpath = '/home/mvanmoer/Vis/projects/lowe-esrt/data/derived/'
+outputpath = './'
 
 # the output is just the name of the .pvd, but there will be a subdirectory
 # with .vtps
