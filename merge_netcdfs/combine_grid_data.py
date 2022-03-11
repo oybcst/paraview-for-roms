@@ -44,7 +44,7 @@ merged.createDimension('s_rho', None)
 
 # copy variables from romsdata to merged... but not all, just the
 # data which has dims (ocean_time, s_rho, 840, 600)
-# Note that there is now w_rho, so there still won't be a 3D velocity
+# Note that there is no w_rho, so there still won't be a 3D velocity
 # vector, just the vector in the uv plane at each rho point
 wantedshape = tuple([romsdata['ocean_time'].size,
                    romsdata['s_rho'].size,
