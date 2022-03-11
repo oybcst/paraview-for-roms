@@ -14,8 +14,8 @@
 import netCDF4
 
 # note that netCDF4.Dataset() doesn't support tilde expansion for $HOME
-datapath = '/home/mvanmoer/Vis/projects/lowe-esrt/data/original/'
-outpath = '/home/mvanmoer/Vis/projects/lowe-esrt/data/derived/'
+datapath = './'
+outpath = './'
 gridfile = 'mobile_whole_grid05032021.nc'
 datafile = 'roms_mobile_bay_output.nc'
 
