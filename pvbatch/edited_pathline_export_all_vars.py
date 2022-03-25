@@ -23,20 +23,27 @@ animationScene1 = GetAnimationScene()
 # update animation scene based on data timesteps
 animationScene1.UpdateAnimationUsingDataTimeSteps()
 
-# Properties modified on top_slice_testnc
+# Properties modified on nc
 # "spherical coordinates" has a particular meaning for how the data is
 # projected in the client GUI, turn off.
-top_slice_testnc.SphericalCoordinates = 0
+nc.SphericalCoordinates = 0
 # need to change fill value to NaNs or ParaView will think the fill value is data
-top_slice_testnc.ReplaceFillValueWithNan = 1
+nc.ReplaceFillValueWithNan = 1
 
 # get active view
 # Even though we're not rendering, we have to have a view established
 # so we can hide the geometry we don't want to export.
 renderView1 = GetActiveViewOrCreate('RenderView')
 
+# slice the top surface, we don't have a w velocity component
+# at the rho points, so no point in having anything but a slice
+slice1 = Slice(registrationName='Slice1', Input=nc)
+slice1.SliceType = 'Plane'
+slice1.SliceType.Origin = [-88.08356907460802, 30.439126530406817, 15.0]
+slice1.SliceType.Normal = [0.0, 0.0, 1.0]
+
 # create a new 'Transform'
-transform1 = Transform(registrationName='Transform1', Input=top_slice_testnc)
+transform1 = Transform(registrationName='Transform1', Input=slice1)
 transform1.Transform = 'Transform'
 
 # Properties modified on transform1.Transform
@@ -48,7 +55,7 @@ calculator1 = Calculator(registrationName='Calculator1', Input=transform1)
 calculator1.Function = ''
 
 # Properties modified on calculator1
-calculator1.ResultArrayName = 'velocity'
+calculator1.ResultArrayName = 'uv_velocity'
 calculator1.Function = 'u_eastward*iHat+v_northward*jHat'
 
 # create a new 'Plane'
@@ -56,16 +63,16 @@ plane1 = Plane(registrationName='Plane1')
 
 # Properties modified on plane1
 # Arbitrary values chosen for visual effect
-plane1.Origin = [-9788270.0, 3358210.0, 0.0]
-plane1.Point1 = [-9783510.0, 3358210.0, 0.0]
-plane1.Point2 = [-9788270.0, 3363310.0, 0.0]
+plane1.Origin = [-9788270.0, 3358210.0, 15.0]
+plane1.Point1 = [-9783510.0, 3358210.0, 15.0]
+plane1.Point2 = [-9788270.0, 3363310.0, 15.0]
 plane1.XResolution = 50
 plane1.YResolution = 50
 
 # create a new 'ParticleTracer'
 particleTracer1 = ParticleTracer(registrationName='ParticleTracer1', Input=calculator1,
     SeedSource=plane1)
-particleTracer1.SelectInputVectors = ['POINTS', 'velocity']
+particleTracer1.SelectInputVectors = ['POINTS', 'uv_velocity']
 
 # Properties modified on particleTracer1
 # Static seeds because the Plane source never changes 
@@ -113,7 +120,7 @@ trailIdLUT = GetColorTransferFunction('TrailId')
 
 
 # hide data in view
-Hide(top_slice_testnc, renderView1)
+Hide(nc, renderView1)
 Hide(transform1, renderView1)
 Hide(calculator1, renderView1)
 Hide(plane1, renderView1)
@@ -162,4 +169,3 @@ SaveData(outputpath + output,
              'velocity', 
              'zooplankton'],
     WriteTimeSteps=1)
-
