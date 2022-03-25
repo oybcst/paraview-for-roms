@@ -69,6 +69,12 @@ def merge(meshfile, datafile):
     merged['ocean_time'].setncatts(data['ocean_time'].__dict__)
     merged['ocean_time'][:] = data['ocean_time'][:]
 
+    # additionally, ocean_time goes from 5061747600 to 5061787200 (with dt of
+    # 3600) which gets exported from ParaView in scientific notation and a
+    # loss of precision
+    merged['ocean_time'][:] = [x - min(merged['ocean_time'][:]) for x in merged['ocean_time'][:]] 
+
+
     # copy lon, lat vars from mesh, but just as the already extracted
     # 1D lons and lats vars. In the Mobile Bay mesh these are 2D variables,
     # it is unclear if they should also be so in the merged file. It appears
