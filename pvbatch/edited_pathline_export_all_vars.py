@@ -5,14 +5,17 @@
 
 #### import the simple module from the paraview
 from paraview.simple import *
+
+# to grab input merged mesh + ROMS output NetCDF from cmdline
+import sys
+
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
 # create a new 'NetCDF Reader'
-data = 'top_slice_test.nc'
-datapath = './'
-top_slice_testnc = NetCDFReader(registrationName=data, FileName=[datapath + data])
-top_slice_testnc.Dimensions = '(latitude, longitude)'
+ncfile = sys.argv[1]
+nc = NetCDFReader(registrationName=ncfile, FileName=[ncfile])
+nc.Dimensions = '(s_rho, lat_rho, lon_rho)'
 
 # get animation scene
 animationScene1 = GetAnimationScene()
