@@ -63,12 +63,22 @@ def merge(meshfile, datafile):
             # copy the data
             merged[name][:] = data[name][:]
 
+    # However, that omits the ocean_time variable (not dimension) which
+    # is 1D, so we must explicitly add it.
+    merged.createVariable('ocean_time', data['ocean_time'].dtype, ('ocean_time'))
+    merged['ocean_time'].setncatts(data['ocean_time'].__dict__)
+    merged['ocean_time'][:] = data['ocean_time'][:]
+
     # copy lon, lat vars from mesh, but just as the already extracted
-    # 1D lons and lats vars
+    # 1D lons and lats vars. In the Mobile Bay mesh these are 2D variables,
+    # it is unclear if they should also be so in the merged file. It appears
+    # to be topologically orthogonal...
     merged.createVariable('lon_rho', mesh['lon_rho'].dtype, ('lon_rho'))
+    merged['lon_rho'].setncatts(mesh['lon_rho'].__dict__)
     merged['lon_rho'][:] = lons
 
     merged.createVariable('lat_rho', mesh['lat_rho'].dtype, ('lat_rho'))
+    merged['lat_rho'].setncatts(mesh['lat_rho'].__dict__)
     merged['lat_rho'][:] = lats
 
     mesh.close()
