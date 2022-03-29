@@ -33,17 +33,16 @@ def merge(meshfile, datafile):
 
     # the actual data 
     data = netCDF4.Dataset(datafile, 'r', format='NETCDF4')
-
+    
     # the merged output
     merged = netCDF4.Dataset('./merged.nc', 'w', format='NETCDF4')
 
-    # createDimension(name, size) - size=None means unlimited
     # replaces xi_rho
-    merged.createDimension('lon_rho', lons.size)
+    merged.createDimension('lon_rho', data.dimensions['xi_rho'].size)
     # replaces eta_rho
-    merged.createDimension('lat_rho', lats.size)
+    merged.createDimension('lat_rho', data.dimensions['eta_rho'].size)
+    merged.createDimension('s_rho', data.dimensions['s_rho'].size)
     merged.createDimension('ocean_time', None)
-    merged.createDimension('s_rho', None)
 
     # copy variables from data to merged... but not all, just the
     # data which has dims (ocean_time, s_rho, 840, 600)
