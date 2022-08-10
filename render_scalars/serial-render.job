@@ -7,7 +7,7 @@ NCDIR=/home/mvanmoer/Vis/projects/lowe-esrt/data/derived/expanse_download/
 # get all the .nc's as a list
 readarray -d '' NCS < <(find $NCDIR -name "*.nc" -print0)
 
-renderscript=from-scratch.py
+renderscript=render-scalar.py
 for nc in ${NCS[@]}; do
     echo "rendering $nc"
     #pvbatch $renderscript oxyg 0 500 'Black, Blue and White' oxygen $nc

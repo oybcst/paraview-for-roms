@@ -11,9 +11,9 @@ NCDIR=/home/mvanmoer/Vis/projects/lowe-esrt/data/derived/expanse_download/
 readarray -d '' NCS < <(find $NCDIR -name "*.nc" -print0)
 
 # eventually want to have this args in an config file instead.
-renderscript="from-scratch.py salt 0 40 \"Viridis (matplotlib)\" salt"
-#renderscript="from-scratch.py oxyg 0 500 \"Black, Blue and White\" oxygen"
-#renderscript="from-scratch.py temp 10 35 Plasma temperature"
+renderscript="render-scalar.py salt 0 40 \"Viridis (matplotlib)\" salt"
+#renderscript="render-scalar.py oxyg 0 500 \"Black, Blue and White\" oxygen"
+#renderscript="render-scalar.py temp 10 35 Plasma temperature"
 
 parallel="time -p parallel --delay 0.2 -j $SLURM_NTASKS --joblog rendering.log --resume"
 
