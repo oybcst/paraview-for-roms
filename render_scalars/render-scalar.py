@@ -19,7 +19,7 @@ winH = 1080
 
 YYYYMMDD = ncfile[-11:-3]
 # hours since start of ROMS data which is 2018-11-01
-start = date(2018, 11, 1)
+start = date(2019, 1, 1)
 curr =  date(int(YYYYMMDD[:4]),int(YYYYMMDD[4:6]),int(YYYYMMDD[6:]))
 dt = curr - start
 dthrs = dt.days * 24
