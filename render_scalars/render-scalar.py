@@ -5,11 +5,12 @@ import sys
 # before the paraview.simple import
 # would rather have these in a YAML or JSON file...
 scalar = sys.argv[1]
-scalarMin = float(sys.argv[2])
-scalarMax = float(sys.argv[3])
-colormap = sys.argv[4]
-pngbase = sys.argv[5]
-ncfile = sys.argv[6]
+zslice = int(sys.argv[2])
+scalarMin = float(sys.argv[3])
+scalarMax = float(sys.argv[4])
+colormap = sys.argv[5]
+pngbase = sys.argv[6]
+ncfile = sys.argv[7]
 
 from paraview.simple import *
 paraview.simple._DisableFirstRenderCameraReset()
@@ -31,12 +32,15 @@ nc.SphericalCoordinates = 0    # don't use spherical coords
 nc.ReplaceFillValueWithNan = 1 # DO replace fill (-9999) with NaN 
 nc.OutputType = 'Automatic'
 
+extractZ = ExtractSubset(Input=nc)
+extractZ.VOI = [0, 599, 0, 840, zslice, zslice]
+
 # Convert from lat, lon to meters. s_rho is meters, this
 # constant was found via googling.
 # the longitude range is -88.4987 to -87.6684
 # the latitude range is 29.7902 to 31.088
 deg2mfactor = 111139.0
-latlon2m = Transform(Input=nc)
+latlon2m = Transform(Input=extractZ)
 latlon2m.Transform = 'Transform'
 latlon2m.Transform.Scale = [deg2mfactor, deg2mfactor, 1.0]
 
