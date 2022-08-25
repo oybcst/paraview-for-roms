@@ -11,7 +11,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH -t 00:40:00
 
-# NOTE: This will NOT run if there is an existing rendering log file in pwd!
+# NOTE: This will NOT run if there is are existing rendering log files in pwd!
 
 export SLURM_EXPORT_ENV=ALL
 module purge
