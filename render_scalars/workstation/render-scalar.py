@@ -32,6 +32,7 @@ nc.SphericalCoordinates = 0    # don't use spherical coords
 nc.ReplaceFillValueWithNan = 1 # DO replace fill (-9999) with NaN 
 nc.OutputType = 'Automatic'
 
+# extract z slice plane, indices go from 0-15, 0 is bottom
 extractZ = ExtractSubset(Input=nc)
 extractZ.VOI = [0, 599, 0, 840, zslice, zslice]
 
@@ -72,6 +73,8 @@ LUT.RescaleTransferFunction(scalarMin, scalarMax)
 # by inspection in ParaView
 #renderView.CameraPosition = [-9789519.81600239, 3382974.081183975, 353675.63746335817]
 #renderView.CameraFocalPoint = [-9789519.81600239, 3382974.08113975, -81642.97223371016]
+
+# or we can just center it over the center, centrally...
 xmin,xmax,ymin,ymax,zmin,zmax = latlon2m.GetDataInformation().GetBounds()
 renderView.CameraPosition = [(xmin+xmax)/2.0, (ymin+ymax)/2.0, 300 * 1000]
 renderView.CameraFocalPoint = [(xmin+xmax)/2.0, (ymin+ymax)/2.0, -100]
