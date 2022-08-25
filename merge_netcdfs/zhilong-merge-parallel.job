@@ -1,0 +1,54 @@
+#!/bin/bash
+#SBATCH --job-name="gnu-parallel-merge"
+#SBATCH --output="gnu-parallel-merge.%j.%N.out"
+#SBATCH --partition=compute
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=16
+#SBATCH --mem=128G
+#SBATCH --account=ncs124
+#SBATCH --export=None
+#SBATCH --mail-user=mvanmoer@illinois.edu
+#SBATCH --mail-type=ALL
+#SBATCH -t 01:00:00
+
+export SLURM_EXPORT_ENV=ALL
+module purge
+module load cpu
+module load gcc
+module load python
+module load py-cftime
+module load py-netcdf4
+module load parallel
+module load slurm
+
+PROJ=/expanse/lustre/projects/ncs124/
+ROMSDIR=$PROJ/liuz1/ROMS_result/mobile_bio_Fennel/
+# There isn't a consistent naming pattern to the directories, so have to
+# list them explicitly.
+NCDIRS=(mobile_201811 mobile_201812 mobile_201901 mobile_201902 mobile_201903 mobile_201904_org mobile_201905_org mobile_201906_bs_sk5 mobile_201907_bs_sk5 mobile_201908_bs_sk5 mobile_201909_bs_sk5 mobile_201910_bs_sk5 mobile_201911_bs_sk5 mobile_201912_bs_sk5)
+BINDIR=$HOME/Vis/projects/lowe-esrt/bin/
+GRID=$HOME/Vis/projects/lowe-esrt/data/original/mobile_whole_grid11202021.nc
+
+cd /scratch/$USER/job_$SLURM_JOB_ID
+
+NCS=()
+ncre='mobile_g01_his_000([0-9]{2}.\nc)'
+# Some of the folders have .nc's we don't want, so have to find
+# the ones we care about using regex
+for d in "${NCDIRS[@]}" ; do
+	readarray -d '' allncs < <(find $ROMSDIR/$d -name "*.nc" -print0)
+	for nc in "${allncs[@]}" ; do
+		if [[ $nc =~ $ncre ]] ; then
+			NCS+=($nc)
+		fi
+	done
+done
+
+
+srun="srun --exclusive -N1 -n1"
+parallel="parallel --delay 0.2 -j $SLURM_NTASKS --joblog runmerge.log --resume"
+
+printf '%s\n' "${NCS[@]}" | $parallel "$srun $BINDIR/runmerge.sh $GRID {} > runmerge.sh.{#}"
+
+mv runmerge.sh.* $PROJ/$USER
+mv runmerge.log $PROJ/$USER 

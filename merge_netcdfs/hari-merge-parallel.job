@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --job-name="gnu-parallel-merge"
+#SBATCH --output="gnu-parallel-merge.%j.%N.out"
+#SBATCH --partition=compute
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=16
+#SBATCH --mem=128G
+#SBATCH --account=ncs124
+#SBATCH --export=None
+#SBATCH -t 01:00:00
+
+export SLURM_EXPORT_ENV=ALL
+module purge
+module load cpu
+module load gcc
+module load python
+module load py-cftime
+module load py-netcdf4
+module load parallel
+module load slurm
+
+PROJ=/expanse/lustre/projects/ncs124/
+ROMSDIR=$PROJ/harisree/ROMS_Results/ROMS_2022_2RUN/ROMS_WT9QC/
+BINDIR=$HOME/Vis/projects/lowe-esrt/bin/
+GRID=$HOME/Vis/projects/lowe-esrt/data/original/mobile_whole_grid11202021.nc
+
+cd /scratch/$USER/job_$SLURM_JOB_ID
+
+srun="srun --exclusive -N1 -n1"
+parallel="parallel --delay 0.2 -j $SLURM_NTASKS --joblog runmerge.log --resume"
+
+find $ROMSDIR -name "*.nc" | $parallel "$srun $BINDIR/runmerge.sh $GRID {} > runmerge.sh.{#}"
+
+mv runmerge.sh.* $PROJ/$USER
+mv runmerge.log $PROJ/$USER 
