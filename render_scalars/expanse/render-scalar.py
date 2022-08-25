@@ -18,16 +18,18 @@ ncfile = sys.argv[7]
 from paraview.simple import *
 paraview.simple._DisableFirstRenderCameraReset()
 
-# This is an unfortunate workaround section. For unknown reasons, ParaView on Expanse will
-# not load every colormap available. The following two lines will print a list of
-# all the colormaps ("lookup tables" or LUTs) that it thinks it sees.
+# This is an unfortunate workaround section. For unknown reasons, ParaView on 
+# Expanse will not load every colormap available. The following two lines will 
+# print a list of all the colormaps ("lookup tables" or LUTs) that it thinks 
+# it sees.
+#
 # availmaps = GetLookupTableNames()
 # print(availmaps)
 #
-# in particular, the Viridis and Plasma colormaps are listed, but using them further
-# below the resulting images are in the Cool to Warm colormap. The workaround is to
-# export the desired colormaps as JSON from a local ParaView, upload to Expanse, and
-# load with the json module. 
+# in particular, the Viridis and Plasma colormaps are listed, but using them 
+# further below the resulting images are in the Cool to Warm colormap. The 
+# workaround is to export the desired colormaps as JSON from a local ParaView, 
+# upload to Expanse, and load with the json module. 
 
 # check if the colormap string passed has a json extension
 cmapre = re.search('json$', colormap)
@@ -38,17 +40,18 @@ if cmapre:
         cmapjson = json.load(json_file)
         cmapRGBpts = cmapjson[0]['RGBPoints']
 
-
 # original showing entire bay
 #winW = 1920 // 3
 #winH = 1080
 
-# for closeup found by inspection in AAE and PV
+# for closeup found by inspection in Adobe AE and ParaView
 winW = 896
 winH = 773
 
+# output images need to be named with sequential numbering so that
+# animation software will recognize them as a series. We use hours
+# since 2019-01-01T00:00:00 as the image index.
 YYYYMMDD = ncfile[-11:-3]
-# hours since start of ROMS data which is 2018-11-01
 start = date(2019, 1, 1)
 curr =  date(int(YYYYMMDD[:4]),int(YYYYMMDD[4:6]),int(YYYYMMDD[6:]))
 dt = curr - start
@@ -63,7 +66,9 @@ nc.OutputType = 'Automatic'
 
 # extract z slice plane, indices go from 0-15, 0 is bottom
 extractZ = ExtractSubset(Input=nc)
-#extractZ.VOI = [0, 599, 0, 840, zslice, zslice]
+# for the whole domain
+#extractZ.VOI = [0, 599, 0, 839, zslice, zslice]
+# for the closeup subdomain
 extractZ.VOI = [0, 599, 60, 577, zslice, zslice]
 
 # Convert from lat, lon to meters. s_rho is meters, this
@@ -103,13 +108,7 @@ LUT.RescaleTransferFunction(scalarMin, scalarMax)
 # for troubleshooting
 #ncDisplay.SetScalarBarVisibility(renderView, True)
 
-# might be better to have this in lat, lon degrees and then convert to
-# meters.
-# by inspection in ParaView
-#renderView.CameraPosition = [-9789519.81600239, 3382974.081183975, 353675.63746335817]
-#renderView.CameraFocalPoint = [-9789519.81600239, 3382974.08113975, -81642.97223371016]
-
-# or we can just center it over the center, centrally...
+# center the camera over the center, centrally...
 xmin,xmax,ymin,ymax,zmin,zmax = latlon2m.GetDataInformation().GetBounds()
 
 #camZ = 300 * 1000 # 300KM up for full data
@@ -128,6 +127,8 @@ for i in range(24):
     pngfile = '{}.{:04d}.png'.format(pngbase, dthrs + i)
     print(f'Saving: {pngfile}...')
     # another workaround - ParaView on Expanse doesn't seem to honor different
-    # background colors (which are set in ~/.config/ParaView/ParaView-UserSettings.json IIUC)
+    # background colors 
+    # (which are set in ~/.config/ParaView/ParaView-UserSettings.json IIUC)
     # but setting TransparentBackground works. Fix in the compositing program
-    SaveScreenshot(pngfile, renderView, ImageResolution=[winW, winH], TransparentBackground=1)
+    SaveScreenshot(pngfile, renderView, 
+            ImageResolution=[winW, winH], TransparentBackground=1)
