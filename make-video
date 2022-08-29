@@ -1,0 +1,52 @@
+#!/bin/bash 
+# 
+# Mark W. Van Moer, NCSA
+# Converting my ffmpeg command line into a shell script.
+
+usage="$(basename "$0") [-h] frame_base_name input_frame_rate output_frame_rate  [start_number] [crf]
+
+where:
+    -h show this help text"
+
+while getopts ':h' option; do
+    case "$option" in
+        h) echo "$usage"
+            exit
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+base=$1
+input_frame_rate=$2
+output_frame_rate=$3
+start_number=$4
+constant_rate_factor=$5
+
+module load FFmpeg/5.0.1
+
+# Options overview
+# -r        "rate" for input and output framerate. Ideally, I will render enough
+#           input images that I could use the default NTSC ~30. However, this
+#           is not always possible.
+# -i        "input" this can magically read sequences with printf specifiers. 
+# -vcodec   libx264 is H.264 MPEG-4 part 10 video.
+# -preset   veryslow means take time to do the best compression possible. 
+# -crf      "constant rate factor" 0 is true lossless. Default is 23. 17
+#           is supposed to be subjectively lossless.
+#           I've only ever seen this be an issue with very subtle
+#           color gradations. The trade-off is file size.
+# -pix_fmt  "pixel format" - default H.264 is yuv444p but Windows MediaPlayer
+#            barks at that so use yuv420p. (True in ~2015, should revisit.)
+
+set -x
+ffmpeg -r "${input_frame_rate}"              \
+       -start_number "${start_number:-0}"    \
+       -i "${base}".%04d.png                 \
+       -vcodec libx264                       \
+       -preset veryslow                      \
+       -crf "${constant_rate_factor:-23}"    \
+       -pix_fmt yuv420p                      \
+       -r "${output_frame_rate}"             \
+       "${base}".mp4 2>&1 >"${base}".log  
+set +x
